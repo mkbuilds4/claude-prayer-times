@@ -1,0 +1,51 @@
+{
+  "name": "prayer-times",
+  "version": "1.0.0",
+  "description": "The next Muslim prayer time in Claude Code's status line, a gentle reminder at adhan, and today's timetable in a pane. Calculated on your machine; no network.",
+  "author": { "name": "Mohamed Ibrahim", "url": "https://mkbuilds.dev" },
+  "homepage": "https://github.com/mkbuilds4/claude-prayer-times",
+  "license": "MIT",
+  "keywords": ["prayer", "salah", "islam", "adhan", "mod"],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "latitude": {
+      "type": "number",
+      "title": "Latitude",
+      "description": "Your latitude in degrees (north positive). 0 means: guess from your time zone.",
+      "default": 0
+    },
+    "longitude": {
+      "type": "number",
+      "title": "Longitude",
+      "description": "Your longitude in degrees (east positive, west negative). 0 means: guess from your time zone.",
+      "default": 0
+    },
+    "place": {
+      "type": "string",
+      "title": "Place name",
+      "description": "What to call your location in the pane, such as Brooklyn. Optional.",
+      "default": ""
+    },
+    "method": {
+      "type": "string",
+      "title": "Calculation method",
+      "description": "auto picks the method most used in your time zone's region.",
+      "options": ["auto", "ISNA", "MWL", "Egyptian", "UmmAlQura", "Karachi"],
+      "default": "auto"
+    },
+    "asr": {
+      "type": "string",
+      "title": "Asr",
+      "description": "Standard (Shafi'i, Maliki, Hanbali) or Hanafi.",
+      "options": ["Standard", "Hanafi"],
+      "default": "Standard"
+    },
+    "sound": {
+      "type": "string",
+      "title": "At adhan",
+      "description": "A soft chime, a spoken reminder, or nothing.",
+      "options": ["chime", "voice", "off"],
+      "default": "chime"
+    }
+  }
+}
