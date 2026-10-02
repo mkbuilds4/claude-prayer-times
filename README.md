@@ -3,9 +3,16 @@
 A small Claude Code mod that keeps the next prayer in view while you work.
 
 - **Under the prompt:** the next prayer, always, among the footer's labels. `Asr 4:18 PM`, or `Asr in 18 min` within the hour.
-- **Above the prompt:** a quiet reminder from 15 minutes before adhan, then `Asr now` for 20 minutes after, with a Done button. On Fridays Dhuhr is shown as Jumu'ah.
+- **Above the prompt:** a quiet reminder from 15 minutes before adhan, then `Asr now` for 20 minutes after, with a Done button that also marks the prayer prayed. On Fridays Dhuhr is shown as Jumu'ah.
 - **At adhan:** a notice and a soft chime (or a spoken reminder, or nothing). With several chats open, only one plays it.
-- **`/prayer`:** today's Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha, tomorrow's Fajr, and the Hijri date.
+- **`/prayer`:** a pane with the day at a glance:
+  - **Today's sky.** The sun's real path across the day, coloured by where it is now (night, dawn, day, sunset), with each prayer marked where the sun stands at its time. The sun glows where it is; at night there are stars and the moon in its actual phase. Hover a prayer to see its time. The next prayer, its countdown and whose time it is now sit on top.
+  - **The timetable,** each prayer with its own icon, and a ○ beside it to mark it prayed. Seven rings fill through the week as you do. What you mark stays on your machine.
+  - **Other days,** with the ‹ and › arrows, and the Hijri date for each.
+  - **The Qibla,** as a compass bearing and the distance to Makkah.
+  - **Location & settings,** for changing them from the pane, which is the only way in the desktop app, where `/config` does not open.
+
+  In the terminal the pane is the same, drawn in text.
 
 Everything is calculated on your machine. It makes no network requests and sends nothing anywhere.
 
@@ -28,7 +35,7 @@ Out of the box it guesses from your time zone: New York for US Eastern, London f
 echo '{"latitude":"40.71","longitude":"-74.01","place":"New York"}' | claude plugin configure prayer-times@mkbuilds --values-stdin
 ```
 
-Or change them in `/config` inside Claude Code. All the settings:
+Or change them in `/config` inside Claude Code, or from **Location & settings** in the `/prayer` pane, which takes a city name (`Northern Virginia`, `Birmingham`, `Makkah`) or coordinates (`38.85, -77.31`). What you set in the pane wins over `/config`; **Use /config instead** clears it. All the settings:
 
 | Setting | What it does | Default |
 |---|---|---|
@@ -54,6 +61,8 @@ Checked against [aladhan.com](https://aladhan.com) for the same location and met
 
 - `plugins/prayer-times/hooks/times.ts`: the calculation, with no Claude Code dependencies.
 - `plugins/prayer-times/hooks/chime.ts`: the chime, synthesized as a WAV in code (no sound files).
+- `plugins/prayer-times/hooks/art.ts`: the pane's pictures (the sky, the icons, the week's rings, the compass), as SVG built in code.
 - `plugins/prayer-times/hooks/register.tsx`: the footer label, reminder, pane and adhan notice.
+- `plugins/prayer-times/tests/render.test.tsx`: draws the pane on every surface and checks marking a prayer and setting a place (`claude plugin test plugins/prayer-times`).
 
 MIT licensed. Made by [MK Builds](https://mkbuilds.dev).

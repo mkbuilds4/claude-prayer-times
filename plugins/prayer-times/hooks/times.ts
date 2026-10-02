@@ -178,3 +178,84 @@ const ZONES: Record<string, { city: string; latitude: number; longitude: number;
 export const guessFromZone = (zone: string) => ZONES[zone] ?? { city: 'Mecca', latitude: 21.42, longitude: 39.83, method: 'UmmAlQura' as Method }
 
 export const clock = (at: Date) => at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+
+// The sun's altitude above the horizon at `at`, in degrees: what the pane's sky
+// is drawn from.
+export const sunAltitude = (at: Date, latitude: number, longitude: number) => {
+  const { declination, equation } = sun(at.getTime() / 86400000 + 2440587.5)
+  const utc = at.getUTCHours() + at.getUTCMinutes() / 60 + at.getUTCSeconds() / 3600
+  const solar = utc + longitude / 15 + (fix(equation + 12, 24) - 12)
+  const hourAngle = (solar - 12) * 15
+  const sinAlt =
+    Math.sin(rad(latitude)) * Math.sin(rad(declination)) +
+    Math.cos(rad(latitude)) * Math.cos(rad(declination)) * Math.cos(rad(hourAngle))
+  return deg(Math.asin(Math.max(-1, Math.min(1, sinAlt))))
+}
+
+// Days since the last new moon, from a known one (2000-01-06 18:14 UTC); good to
+// within a day, which is all a drawing of the moon needs.
+export const moonAge = (at: Date) => fix(at.getTime() / 86400000 + 2440587.5 - 2451550.26, 29.530588853)
+
+const KAABA = { latitude: 21.4225, longitude: 39.8262 }
+
+// Bearing to the Kaaba from true north, clockwise, and the distance there.
+export const qibla = (latitude: number, longitude: number) => {
+  const φ = rad(latitude)
+  const φk = rad(KAABA.latitude)
+  const Δλ = rad(KAABA.longitude - longitude)
+  const bearing = fixAngle(deg(Math.atan2(Math.sin(Δλ), Math.cos(φ) * Math.tan(φk) - Math.sin(φ) * Math.cos(Δλ))))
+  const a = Math.sin((φk - φ) / 2) ** 2 + Math.cos(φ) * Math.cos(φk) * Math.sin(Δλ / 2) ** 2
+  return { bearing, km: 2 * 6371 * Math.asin(Math.sqrt(a)) }
+}
+
+export const compassPoint = (bearing: number) =>
+  ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(fixAngle(bearing) / 45) % 8]
+
+// Places the location field knows by name, beyond the time zones' cities.
+const PLACES: Record<string, { latitude: number; longitude: number }> = {
+  ...Object.fromEntries(Object.values(ZONES).map(z => [z.city, { latitude: z.latitude, longitude: z.longitude }])),
+  'Washington DC': { latitude: 38.91, longitude: -77.04 },
+  'Northern Virginia': { latitude: 38.85, longitude: -77.31 },
+  Baltimore: { latitude: 39.29, longitude: -76.61 },
+  Philadelphia: { latitude: 39.95, longitude: -75.17 },
+  Boston: { latitude: 42.36, longitude: -71.06 },
+  Atlanta: { latitude: 33.75, longitude: -84.39 },
+  Houston: { latitude: 29.76, longitude: -95.37 },
+  Dallas: { latitude: 32.78, longitude: -96.8 },
+  Minneapolis: { latitude: 44.98, longitude: -93.27 },
+  'San Francisco': { latitude: 37.77, longitude: -122.42 },
+  Seattle: { latitude: 47.61, longitude: -122.33 },
+  Montreal: { latitude: 45.5, longitude: -73.57 },
+  Birmingham: { latitude: 52.49, longitude: -1.89 },
+  Manchester: { latitude: 53.48, longitude: -2.24 },
+  Makkah: { latitude: 21.42, longitude: 39.83 },
+  Medina: { latitude: 24.47, longitude: 39.61 },
+  Jeddah: { latitude: 21.49, longitude: 39.19 },
+  Jerusalem: { latitude: 31.78, longitude: 35.22 },
+  Alexandria: { latitude: 31.2, longitude: 29.92 },
+  Khartoum: { latitude: 15.5, longitude: 32.56 },
+  Lahore: { latitude: 31.55, longitude: 74.34 },
+  Islamabad: { latitude: 33.68, longitude: 73.05 },
+  'Abu Dhabi': { latitude: 24.45, longitude: 54.38 },
+}
+
+// What the location field accepts: "38.85, -77.31", "38.85, -77.31 Fairfax", or
+// a place it knows by name. Null when it cannot tell.
+export const parseLocation = (text: string) => {
+  const input = text.trim()
+  const coords = input.match(/^(-?\d+(?:\.\d+)?)\s*[,\s]\s*(-?\d+(?:\.\d+)?)\s*,?\s*(.*)$/)
+  if (coords) {
+    const latitude = Number(coords[1])
+    const longitude = Number(coords[2])
+    if (Math.abs(latitude) > 90 || Math.abs(longitude) > 180) return null
+    return { latitude, longitude, place: coords[3]?.trim() || `${latitude.toFixed(2)}, ${longitude.toFixed(2)}` }
+  }
+  const wanted = input.toLowerCase()
+  if (!wanted) return null
+  const names = Object.keys(PLACES)
+  const name =
+    names.find(n => n.toLowerCase() === wanted) ??
+    names.find(n => n.toLowerCase().startsWith(wanted)) ??
+    names.find(n => n.toLowerCase().includes(wanted))
+  return name ? { ...PLACES[name]!, place: name } : null
+}
