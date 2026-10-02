@@ -1,14 +1,31 @@
 {
   "name": "mkbuilds",
-  "owner": { "name": "Mohamed Ibrahim", "url": "https://mkbuilds.dev" },
-  "description": "Claude Code mods by MK Builds",
+  "owner": {
+    "name": "Mohamed Ibrahim",
+    "url": "https://mkbuilds.dev"
+  },
+  "description": "Claude Code mods by MK Builds, including the ones NotchNerd works with",
   "plugins": [
+    {
+      "name": "notchnerd",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/7amza-eth/NotchNerd.git",
+        "path": "tooling/claude-code-mod",
+        "ref": "main"
+      },
+      "description": "Lets Claude read and add to the NotchNerd notepad, gives you /notch to jot a line into it, and lets you reply to sessions from the notch.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "homepage": "https://github.com/7amza-eth/NotchNerd"
+    },
     {
       "name": "prayer-times",
       "source": "./plugins/prayer-times",
       "description": "The next prayer time under Claude Code's prompt, a gentle reminder at adhan, and a pane with today's sky, the timetable, a prayer tracker and the Qibla. Calculated on your machine.",
       "version": "1.1.2",
-      "category": "productivity"
+      "category": "productivity",
+      "homepage": "https://github.com/mkbuilds4/mods/tree/main/plugins/prayer-times"
     }
   ]
 }
