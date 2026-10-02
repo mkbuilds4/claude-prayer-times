@@ -1,0 +1,53 @@
+name: Build marketplace
+
+# Regenerates .claude-plugin/marketplace.json from community-mods.json, pinning each mod to its
+# latest GitHub release. Runs when the list changes, when this repo publishes a release, and
+# nightly so authors' new releases reach users (the way Obsidian picks up new plugin versions).
+on:
+  push:
+    branches: [main]
+    paths:
+      - community-mods.json
+      - community-mods-removed.json
+      - scripts/**
+      - .github/workflows/build.yml
+  release:
+    types: [published]
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-marketplace
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22.x"
+
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/build-marketplace.mjs
+
+      - name: Validate
+        run: npx -y @anthropic-ai/claude-code plugin validate .
+
+      - name: Commit
+        run: |
+          if git diff --quiet; then echo "No changes."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Rebuild marketplace from community-mods.json"
+          git push

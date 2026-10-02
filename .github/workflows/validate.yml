@@ -1,0 +1,56 @@
+name: Check mod submission
+
+# Runs on every PR, like Obsidian's review bot. pull_request_target lets it comment on PRs from
+# forks; for that reason it only checks out this repo's base branch and reads the PR's
+# community-mods.json as data. It never checks out or runs code from the PR.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+      AUTHOR: ${{ github.event.pull_request.user.login }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22.x"
+
+      - name: Read the submitted list
+        run: |
+          cp community-mods.json "$RUNNER_TEMP/base.json"
+          git fetch --no-tags --depth=1 origin "pull/$PR/head"
+          git show FETCH_HEAD:community-mods.json > "$RUNNER_TEMP/head.json" 2>/dev/null \
+            || echo "(missing)" > "$RUNNER_TEMP/head.json"
+          gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json files -q '.files[].path' > "$RUNNER_TEMP/files.txt"
+
+      - name: Check
+        id: check
+        continue-on-error: true
+        run: |
+          mapfile -t FILES < "$RUNNER_TEMP/files.txt"
+          node scripts/validate-submission.mjs "$RUNNER_TEMP/base.json" "$RUNNER_TEMP/head.json" \
+            "$RUNNER_TEMP/report.md" "$AUTHOR" "${FILES[@]}"
+
+      - name: Comment
+        run: |
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/report.md" --edit-last \
+            || gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/report.md"
+
+      - name: Fail on problems
+        if: steps.check.outcome == 'failure'
+        run: exit 1
