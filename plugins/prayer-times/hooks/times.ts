@@ -1,5 +1,13 @@
-// Prayer time calculation, after the PrayTimes.org method (Hamid Zarrabi-Zadeh,
-// LGPL), rewritten in TypeScript. Pure: no engine calls, so it can be tested alone.
+// SPDX-License-Identifier: LGPL-3.0-only
+//
+// Prayer time calculation, ported to TypeScript from PrayTimes.js 2.3 by Hamid
+// Zarrabi-Zadeh (praytimes.org), which is licensed under the GNU LGPL v3.0. This
+// file is under that license too (see ../LICENSES/LGPL-3.0.txt and GPL-3.0.txt);
+// the rest of this plugin is MIT. Modified from the original: rewritten in
+// TypeScript, trimmed to five methods, times rounded to the minute, and extended
+// with the next prayer, the sun's altitude, the moon's age, the Qibla and places.
+//
+// Pure: no engine calls, so it can be tested alone.
 
 export type Method = 'ISNA' | 'MWL' | 'Egyptian' | 'UmmAlQura' | 'Karachi'
 export type AsrMethod = 'Standard' | 'Hanafi'

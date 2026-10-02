@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Mohamed Ibrahim
+Copyright (c) 2026 Mohamed Ibrahim (MK Builds)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+This license covers everything in this repository except
+plugins/prayer-times/hooks/times.ts, the prayer time calculation. That file is
+ported from PrayTimes.js by Hamid Zarrabi-Zadeh (praytimes.org) and is licensed
+under the GNU Lesser General Public License v3.0. Its text is in
+plugins/prayer-times/LICENSES/LGPL-3.0.txt, with the GNU GPL v3.0 it builds on
+in plugins/prayer-times/LICENSES/GPL-3.0.txt.
