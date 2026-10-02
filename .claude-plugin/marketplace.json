@@ -7,7 +7,7 @@
       "name": "prayer-times",
       "source": "./plugins/prayer-times",
       "description": "The next prayer time in Claude Code's status line, a gentle reminder at adhan, and today's timetable. Calculated on your machine.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "category": "productivity"
     }
   ]

@@ -24,6 +24,7 @@ const AFTER_MS = 20 * 60 * 1000
 const ANNOUNCE_WINDOW_MS = 3 * 60 * 1000
 
 const minute = { plugin: 'prayer-times', key: 'minute' } as const
+const footer = { plugin: 'prayer-times', key: 'footer' } as const
 const done = { plugin: 'prayer-times', key: 'done' } as const
 
 type Config = { settings: Settings; place: string; guessed: boolean; sound: 'chime' | 'voice' | 'off' }
@@ -86,7 +87,7 @@ const statusText = (now: Date) => {
 async function tick($: EngineInterface) {
   const now = new Date(await $.clock.now())
   await $.state.set(minute, Math.floor(now.getTime() / 60000))
-  $.ui.status(statusText(now))
+  await $.state.set(footer, statusText(now))
 
   const current = currentPrayer(now, config.settings, ANNOUNCE_WINDOW_MS)
   if (!current) return
@@ -109,6 +110,12 @@ async function tick($: EngineInterface) {
 
 export const register: Register = (on, options) => {
   readConfig(options)
+
+  // Shown among the prompt footer's labels, where no plugin name is drawn beside it.
+  on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
+    const { value: text } = await $.state.get(footer)
+    return text ? next({ ...e, props: { ...e.props, modes: [...e.props.modes, text] } }) : next(e)
+  })
 
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'prayer', description: "Today's prayer times" })

@@ -2,7 +2,7 @@
 
 A small Claude Code mod that keeps the next prayer in view while you work.
 
-- **Status line:** the next prayer, always. `Asr 4:18 PM`, or `Asr in 18 min` within the hour.
+- **Under the prompt:** the next prayer, always, among the footer's labels. `Asr 4:18 PM`, or `Asr in 18 min` within the hour.
 - **Above the prompt:** a quiet reminder from 15 minutes before adhan, then `Asr now` for 20 minutes after, with a Done button. On Fridays Dhuhr is shown as Jumu'ah.
 - **At adhan:** a notice and a soft chime (or a spoken reminder, or nothing). With several chats open, only one plays it.
 - **`/prayer`:** today's Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha, tomorrow's Fajr, and the Hijri date.
@@ -18,7 +18,7 @@ claude plugin marketplace add mkbuilds4/claude-prayer-times
 claude plugin install prayer-times@mkbuilds
 ```
 
-Start a new chat and the next prayer appears in the status line.
+Start a new chat and the next prayer appears under the prompt.
 
 ## Set your location
 
@@ -54,6 +54,6 @@ Checked against [aladhan.com](https://aladhan.com) for the same location and met
 
 - `plugins/prayer-times/hooks/times.ts`: the calculation, with no Claude Code dependencies.
 - `plugins/prayer-times/hooks/chime.ts`: the chime, synthesized as a WAV in code (no sound files).
-- `plugins/prayer-times/hooks/register.tsx`: the status line, reminder, pane and adhan notice.
+- `plugins/prayer-times/hooks/register.tsx`: the footer label, reminder, pane and adhan notice.
 
 MIT licensed. Made by [MK Builds](https://mkbuilds.dev).
