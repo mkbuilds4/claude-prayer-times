@@ -1,6 +1,6 @@
 # MK Builds mods
 
-A Claude Code marketplace of mods by [MK Builds](https://mkbuilds.dev). Mods run inside Claude Code, in the terminal or the desktop app's Code tab.
+An open directory of Claude Code mods, run by [MK Builds](https://mkbuilds.dev) and open to community submissions. Mods run inside Claude Code, in the terminal or the desktop app's Code tab, and [NotchNerd](https://github.com/7amza-eth/NotchNerd) can install them from its Settings.
 
 | Mod | What it does |
 | --- | --- |
@@ -21,14 +21,21 @@ Start a new chat and the mod loads. If you use NotchNerd, you can also install a
 
 Installed from the old `mkbuilds4/claude-prayer-times` name? Nothing to do: GitHub forwards it here, and `claude plugin marketplace update mkbuilds` picks up new mods.
 
-## Adding a mod
+## Submit your own
 
-A mod can live in this repo under `plugins/<name>` or in its own repo. Add an entry to [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) (use a `git-subdir` source when the plugin sits in a subfolder of another repo), bump its `version` when you release, and check the catalog with:
+The directory is open to everyone, the way Obsidian's plugin directory is: your code stays in your repo, and you open a PR that adds one entry to [`community-mods.json`](community-mods.json). A bot checks it, a maintainer reviews it, and once it's merged your mod shows up in NotchNerd's Settings → Mods and in `claude plugin install`. Full steps are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-```bash
-claude plugin validate .
-```
+## How it works
+
+| File | What it is |
+| --- | --- |
+| [`community-mods.json`](community-mods.json) | The list. The only file a submission changes. |
+| [`community-mods-removed.json`](community-mods-removed.json) | Mods taken out of the directory, with the reason. NotchNerd warns anyone who still has one. |
+| [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | **Generated**; don't edit it. The Claude Code marketplace built from the list, with each mod pinned to its latest GitHub release. |
+| [`community-mod-stats.json`](community-mod-stats.json) | Generated: stars and latest release for each mod. |
+
+[`build.yml`](.github/workflows/build.yml) regenerates the marketplace when the list changes and every night, so new releases reach users without a PR. [`validate.yml`](.github/workflows/validate.yml) checks submissions.
 
 ## License
 
-Each mod carries its own license: [`prayer-times`](plugins/prayer-times#license) is MIT with an LGPL calculation file, and `notchnerd` is GPL v3 like the NotchNerd app.
+Each mod carries its own license, in its own repo. This repo's scripts and [`prayer-times`](plugins/prayer-times#license) are MIT (with an LGPL calculation file); `notchnerd` is GPL v3 like the NotchNerd app.

@@ -1,24 +1,12 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mkbuilds",
   "owner": {
-    "name": "Mohamed Ibrahim",
+    "name": "MK Builds",
     "url": "https://mkbuilds.dev"
   },
-  "description": "Claude Code mods by MK Builds, including the ones NotchNerd works with",
+  "description": "Claude Code mods for NotchNerd and beyond, by MK Builds and the community. Generated from community-mods.json.",
   "plugins": [
-    {
-      "name": "notchnerd",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/7amza-eth/NotchNerd.git",
-        "path": "tooling/claude-code-mod",
-        "ref": "main"
-      },
-      "description": "Lets Claude read and add to the NotchNerd notepad, gives you /notch to jot a line into it, and lets you reply to sessions from the notch.",
-      "version": "0.1.0",
-      "category": "productivity",
-      "homepage": "https://github.com/7amza-eth/NotchNerd"
-    },
     {
       "name": "prayer-times",
       "source": "./plugins/prayer-times",
@@ -26,6 +14,22 @@
       "version": "1.1.2",
       "category": "productivity",
       "homepage": "https://github.com/mkbuilds4/mods/tree/main/plugins/prayer-times"
+    },
+    {
+      "name": "notchnerd",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/7amza-eth/NotchNerd.git",
+        "path": "tooling/claude-code-mod",
+        "ref": "v0.3.3",
+        "sha": "9914e4315611cb837240f89ef03f27c2d93fba68"
+      },
+      "description": "Lets Claude read and add to the NotchNerd notepad, gives you /notch to jot a line into it, and lets you reply to sessions from the notch.",
+      "version": "0.1.0",
+      "author": {
+        "name": "MK Builds"
+      },
+      "homepage": "https://github.com/7amza-eth/NotchNerd/tree/v0.3.3/tooling/claude-code-mod"
     }
   ]
 }
