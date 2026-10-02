@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { Elements, EngineInterface, Register } from 'claude-code'
 
 import type { PrayerTimesPrefs as Prefs } from '../types'
-import { compass, hero, icon, week } from './art'
+import { compass, hero, HERO_SIZE, icon, week, weekSize } from './art'
 import { chimeWav, toBase64 } from './chime'
 import {
   clock,
@@ -551,7 +551,7 @@ export const register: Register = (on, loaded) => {
           </Box>
         </Box>
 
-        <Svg source={sky} alt={skyAlt} isInteractive />
+        <Svg source={sky} alt={skyAlt} width={HERO_SIZE.width} height={HERO_SIZE.height} isInteractive />
 
         <Box flexDirection="column">
           {d.rows.map(row => [
@@ -586,6 +586,8 @@ export const register: Register = (on, loaded) => {
           <Svg
             source={week(d.weekDays)}
             alt={`Prayers marked this week: ${d.weekDays.map(day => `${day.letter} ${day.count}`).join(', ')}`}
+            width={weekSize(d.weekDays.length).width}
+            height={weekSize(d.weekDays.length).height}
             isInteractive
           />
           {d.weekTotal === 0 && <Text dimColor>Press ○ beside a prayer once you've prayed it, and the rings fill.</Text>}
