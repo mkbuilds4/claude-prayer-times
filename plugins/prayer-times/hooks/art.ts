@@ -5,6 +5,11 @@ import { moonAge, ORDER, sunAltitude, type PrayerName } from './times'
 
 const FONT = `-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif`
 
+// The desktop draws an interactive Svg in a sandboxed frame of its own. When the
+// app is dark and the frame's document names no colour scheme, the browser backs
+// the frame with opaque white; naming both keeps it transparent in either theme.
+const SCHEME = ':root{color-scheme:light dark}'
+
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 const n = (v: number) => Math.round(v * 10) / 10
 
@@ -83,6 +88,12 @@ const H = 236
 const HORIZON = 182
 const LEFT = 14
 const RIGHT = W - 14
+
+// The frame an interactive Svg is drawn in takes the element's width and height
+// props, and without them is a default iframe, 150px tall. Each drawing's own
+// size, then, to pass there. A narrower pane shrinks the frame's width, and the
+// drawing scales down into its top left corner.
+export const HERO_SIZE = { width: W, height: H }
 
 // The day's sky: the sun's real path across it, each prayer where the sun stands
 // at its time, and the sun (or the moon) now.
@@ -174,7 +185,7 @@ export const hero = (a: HeroArgs) => {
     ? `<g><rect x="${W - 14 - pillWidth}" y="16" width="${pillWidth}" height="22" rx="11" fill="#000" opacity=".22"/><text x="${W - 14 - pillWidth / 2}" y="31" text-anchor="middle" class="pill">${esc(a.pill)}</text></g>`
     : ''
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMinYMin meet">
 <defs>
 <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky.top}"/><stop offset="${n(HORIZON / H)}" stop-color="${sky.horizon}"/><stop offset="1" stop-color="${sky.horizon}"/></linearGradient>
 <radialGradient id="sunGlow"><stop offset="0" stop-color="#fff3c4" stop-opacity=".95"/><stop offset=".45" stop-color="#ffd27a" stop-opacity=".45"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
@@ -182,6 +193,7 @@ export const hero = (a: HeroArgs) => {
 <clipPath id="card"><rect width="${W}" height="${H}" rx="14"/></clipPath>
 </defs>
 <style>
+${SCHEME}
 text{font-family:${FONT};fill:#fff}
 .eyebrow{font-size:10.5px;font-weight:600;letter-spacing:1.3px;opacity:.75}
 .big{font-size:31px;font-weight:650;letter-spacing:-.4px}
@@ -244,9 +256,15 @@ export const icon = (name: PrayerName, dim: boolean) =>
 
 export type WeekDay = { letter: string; count: number; isToday: boolean; title: string }
 
+const DAY_WIDTH = 44
+const WEEK_HEIGHT = 56
+
+// The week's own size, for the frame it is drawn in (as HERO_SIZE is).
+export const weekSize = (days: number) => ({ width: DAY_WIDTH * days, height: WEEK_HEIGHT })
+
 // Seven rings, one a day, each filling as that day's five prayers are marked.
 export const week = (days: WeekDay[]) => {
-  const w = 44
+  const w = DAY_WIDTH
   const r = 13
   const c = 2 * Math.PI * r
   const rings = days
@@ -266,7 +284,8 @@ export const week = (days: WeekDay[]) => {
       return `<g class="day"><title>${esc(d.title)}</title><circle cx="${cx}" cy="20" r="${r}" fill="none" stroke="#8a8f98" stroke-opacity=".28" stroke-width="4"/>${arc}${inner}<text x="${cx}" y="50" text-anchor="middle" class="letter${d.isToday ? ' today' : ''}">${esc(d.letter)}</text></g>`
     })
     .join('')
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w * days.length}" height="56" viewBox="0 0 ${w * days.length} 56"><style>text{font-family:${FONT};fill:#8a8f98}.count{font-size:11px;font-weight:600}.letter{font-size:10px;font-weight:600}.today{fill:#34c27a}.day{cursor:default}.day:hover circle:first-of-type{stroke-opacity:.5}</style>${rings}</svg>`
+  const { width, height } = weekSize(days.length)
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMinYMin meet"><style>${SCHEME}text{font-family:${FONT};fill:#8a8f98}.count{font-size:11px;font-weight:600}.letter{font-size:10px;font-weight:600}.today{fill:#34c27a}.day{cursor:default}.day:hover circle:first-of-type{stroke-opacity:.5}</style>${rings}</svg>`
 }
 
 // A compass rose with the needle on the Qibla, the Kaaba at its tip.
